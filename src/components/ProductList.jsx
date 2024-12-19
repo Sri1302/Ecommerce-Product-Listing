@@ -41,9 +41,20 @@ const ProductList = () => {
     dispatch(updateQuantity({ id, quantity: Math.min(7, Math.max(1, value)) }));
   };
 
-  const handleBuyNow = (product) => {
-    const quantity = quantities[product.id] || 1; // Ensure a quantity is selected
-    navigate("/checkout", { state: { product, quantity } });
+  const handleBuyNow = () => {
+    if (cart.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    // Create an array of cart items with their quantities to pass to checkout
+    const cartDetails = cart.map(item => ({
+      ...item, // Spread product details
+      quantity: quantities[item.id] || 1, // Get the quantity from state or default to 1
+    }));
+
+    // Navigate to checkout with cart details
+    navigate("/checkout", { state: { cartDetails } });
   };
 
   const increaseQuantity = (productId) => {
@@ -132,7 +143,7 @@ const ProductList = () => {
 
             {/* Buy Now Button */}
             <button
-              onClick={() => handleBuyNow(product)}
+              onClick={handleBuyNow}
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors w-full"
             >
               Buy Now

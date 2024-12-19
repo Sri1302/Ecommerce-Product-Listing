@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { loadCart } from "../assets/redux/slices/cartSlice"; // Import loadCart action
+import { useDispatch } from 'react-redux';
+
 
 const Login = () => {
   const [data, setData] = useState({
@@ -9,6 +12,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +36,7 @@ const Login = () => {
         console.log('Login Successful', user);
         // Save user to localStorage
         localStorage.setItem('user', JSON.stringify(user));
+        dispatch(loadCart()); // Load the cart for the logged-in user
         navigate('/');
       } else {
         setError('Invalid credentials');

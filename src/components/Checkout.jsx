@@ -1,85 +1,177 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { FaShoppingCart, FaCreditCard } from "react-icons/fa";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setShippingDetails, calculateTotalAmount } from "../assets/redux/slices/cartSlice";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import { useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
 import { clearCart } from "../assets/redux/slices/cartSlice";
-import { useDispatch } from "react-redux";
 
- const Checkout = () => {
-  const location = useLocation();
-  const { product, quantity } = location.state || {};  // Destructure product and quantity from state
-
+const Checkout = () => {
+  const stripe = useStripe();
+  const elements = useElements();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  if (!product || quantity === undefined) {
-    // Redirect or show error if no product details or quantity is passed
-    navigate("/");  // Redirect if no product/quantity is passed
-    return <p>Redirecting...</p>;  // Placeholder for redirect or error message
-  }
+  const { cartItems, shippingDetails, totalAmount } = useSelector((state) => state.cart);
 
-  // Handle place order logic
-  const handlePlaceOrder = () => {
-    // Typically, here, you would handle the order logic (e.g., API call)
-    alert("Order placed successfully!");
-    dispatch(clearCart());  // Optionally clear cart after placing the order
-    navigate("/");  // Redirect to home or main page
+  useEffect(() => {
+    dispatch(calculateTotalAmount());
+  }, [cartItems, dispatch]);
+
+  const handleShippingChange = (event) => {
+    const { name, value } = event.target;
+    dispatch(setShippingDetails({ ...shippingDetails, [name]: value }));
+  };
+
+  const handlePayment = async (event) => {
+    event.preventDefault();
+    if (!stripe || !elements) return; // Stripe.js not yet loaded
+
+    const cardElement = elements.getElement(CardElement);
+    const { error, paymentMethod } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardElement,
+      billing_details: {
+        address: {
+          line1: shippingDetails.address,
+          city: shippingDetails.city,
+          state: shippingDetails.state,
+          postal_code: shippingDetails.zipCode,
+        },
+      },
+    });
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    // Simulate payment success
+    if (paymentMethod) {
+      console.log("Payment successful!", paymentMethod);
+
+      // Create order object
+      const newOrder = {
+        userId: JSON.parse(localStorage.getItem("user")).id,
+        totalAmount,
+        date: new Date().toISOString(),
+        products: cartItems,
+        shippingDetails,
+      };
+
+      // Store order in localStorage
+      const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      localStorage.setItem("orders", JSON.stringify([...existingOrders, newOrder]));
+
+      // Clear cart and navigate to orders
+      dispatch(clearCart());
+      navigate("/orders");
+    }
   };
 
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-6">
       <h2 className="text-2xl font-semibold">Checkout</h2>
+
+      {/* Order Summary */}
       <div>
-        {/* Order Summary */}
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold">Order Summary</h3>
-          <ul>
-            <li className="flex justify-between py-2 border-b">
-              <div>
-                <span className="font-medium">{product.name}</span> x{quantity}
-              </div>
-              <div className="font-bold">${(product.price * quantity).toFixed(2)}</div>
-            </li>
-          </ul>
-          <div className="mt-4 text-lg font-bold">
-            Total: ${(product.price * quantity).toFixed(2)}
-          </div>
-        </div>
-
-        {/* Payment Section */}
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold">Payment</h3>
-          <div className="mt-4 flex items-center gap-2">
-            <FaCreditCard className="text-xl" />
-            <input
-              type="text"
-              placeholder="Enter your credit card details"
-              className="p-2 border rounded-md w-full"
-            />
-          </div>
-        </div>
-
-        {/* Place Order Button */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={handlePlaceOrder}
-            className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
-          >
-            <FaShoppingCart />
-            Place Order
-          </button>
+        <h3 className="text-xl font-semibold">Order Summary</h3>
+        <div className="mt-4 text-lg font-bold">
+          Total: ${totalAmount.toFixed(2)} {/* Display directly in dollars */}
         </div>
       </div>
-      <div className="mx-20 my-5  ">
-      <button
-            onClick={()=>{navigate('/')}}
-            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
-          > 
-            Go to 🏠 page
-          </button>
+
+      {/* Cart Items */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold">Items</h3>
+        <ul className="list-disc pl-6 mt-4">
+          {cartItems.map((item, index) => (
+            <li key={index}>
+              <span>{item.name}</span> - {item.quantity} x ${item.price.toFixed(2)}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Shipping Address */}
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold">Shipping Address</h3>
+        <div className="mt-4">
+          <label htmlFor="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={shippingDetails.name}
+            onChange={handleShippingChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+        <div className="mt-4">
+          <label htmlFor="address">Address</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            value={shippingDetails.address}
+            onChange={handleShippingChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+        <div className="mt-4">
+          <label htmlFor="city">City</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            value={shippingDetails.city}
+            onChange={handleShippingChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+        <div className="mt-4">
+          <label htmlFor="state">State</label>
+          <input
+            type="text"
+            id="state"
+            name="state"
+            value={shippingDetails.state}
+            onChange={handleShippingChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+        <div className="mt-4">
+          <label htmlFor="zipCode">ZIP Code</label>
+          <input
+            type="text"
+            id="zipCode"
+            name="zipCode"
+            value={shippingDetails.zipCode}
+            onChange={handleShippingChange}
+            className="p-2 border rounded-md w-full"
+          />
+        </div>
+      </div>
+
+      {/* Payment Section */}
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold">Payment</h3>
+        <form onSubmit={handlePayment}>
+          <div className="mt-4">
+            <CardElement />
           </div>
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center gap-2 mt-6"
+            disabled={!stripe}
+          >
+            <FaShoppingCart />
+            Pay Now
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
-
-export default Checkout
+export default Checkout;

@@ -4,10 +4,14 @@ import ProductList from "./components/ProductList";
 import { useNavigate } from "react-router-dom";
 import { FaSun, FaMoon, FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { AiOutlineAmazon } from "react-icons/ai"; // Amazon logo icon
+import { clearCart } from "./assets/redux/slices/cartSlice";
+import { useDispatch } from "react-redux";
+import { FaBoxOpen } from "react-icons/fa"
 
 const App = () => {
   const { theme, toggleTheme } = useContext(ThemeContext); // Use Theme Context
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   // Get the logged-in user from localStorage
   const user = JSON.parse(localStorage.getItem('user'));
@@ -15,6 +19,7 @@ const App = () => {
   const handleLogout = () => {
     // Clear user data from localStorage
     localStorage.removeItem('user');
+    dispatch(clearCart());
     navigate('/login');
   };
 
@@ -83,6 +88,13 @@ const App = () => {
                 >
                   Logout
                 </button>
+                <button
+  onClick={() => navigate("/orders")}
+  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
+>
+  <FaBoxOpen className="mr-2" /> {/* Changed to a box icon */}
+  My Orders
+</button>
               </div>
             </div>
           ) : null}
