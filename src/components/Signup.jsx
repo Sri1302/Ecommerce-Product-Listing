@@ -13,7 +13,7 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://6760fdbb6be7889dc35f683a.mockapi.io/users', data);
+            const response = await axios.post('https://67979ee8c2c861de0c6d6a79.mockapi.io/users', data);
             console.log('User created', response.data);
             localStorage.setItem('user', JSON.stringify(response.data));
             localStorage.setItem(`cart_${response.data.id}`, JSON.stringify([])); // Initialize empty cart
