@@ -71,11 +71,13 @@ const Checkout = () => {
 
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-6">
-      <h2 className="text-2xl font-semibold">Checkout</h2>
+        <h2 className="text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 drop-shadow-md mb-6 animate-pulse">
+       Checkout
+      </h2>
 
       {/* Order Summary */}
-      <div>
-        <h3 className="text-xl font-semibold">Order Summary</h3>
+      <div className="text-center">
+        <h3 className="text-xl  font-semibold">Order Summary</h3>
         <div className="mt-4 text-lg font-bold">
           Total: ${totalAmount.toFixed(2)} {/* Display directly in dollars */}
         </div>
@@ -94,7 +96,7 @@ const Checkout = () => {
       </div>
 
       {/* Shipping Address */}
-      <div className="mt-6">
+      <div className="mt-6 text-center">
         <h3 className="text-xl font-semibold">Shipping Address</h3>
         <div className="mt-4">
           <label htmlFor="name">Full Name</label>

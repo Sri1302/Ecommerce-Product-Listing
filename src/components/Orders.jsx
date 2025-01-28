@@ -1,6 +1,6 @@
-import React, { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AiOutlineAmazon } from "react-icons/ai"; 
+import { AiOutlineAmazon } from "react-icons/ai";
 import { ThemeContext } from "../context/ThemeContext";
 import { FaSun, FaMoon, FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { FaBoxOpen } from "react-icons/fa";
@@ -11,7 +11,6 @@ const Orders = () => {
   const navigate = useNavigate(); // Hook to handle navigation
   const { theme, toggleTheme } = useContext(ThemeContext);
 
-  
   const handleLogout = () => {
     // Clear user data from localStorage
     localStorage.removeItem("user");
@@ -57,82 +56,76 @@ const Orders = () => {
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-6">
       <header className="max-w-screen-lg mx-auto p-4 shadow-lg border-4 border-blue-500 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100">
-      {/* Main Flex Container */}
-      <div className="flex justify-between items-center">
-        {/* Amazon logo with transition effect */}
-        <div
-          className="flex items-center gap-2 cursor-pointer hover:scale-105 transform transition-all duration-300"
-          onClick={() => navigate("/")}
-        >
-          <AiOutlineAmazon className="text-5xl text-blue-600 hover:text-blue-800 transition-all duration-300" />
-          <h1 className="text-4xl font-extrabold text-blue-600 hover:text-blue-800 transition-all transform duration-300">
-            Amaz0n
-          </h1>
-        </div>
+        {/* Main Flex Container */}
+        <div className="flex justify-between items-center">
+          {/* Amazon logo with transition effect */}
+          <div
+            className="flex items-center gap-2 cursor-pointer hover:scale-105 transform transition-all duration-300"
+            onClick={() => navigate("/")}
+          >
+            <AiOutlineAmazon className="text-5xl text-blue-600 hover:text-blue-800 transition-all duration-300" />
+            <h1 className="text-4xl font-extrabold text-blue-600 hover:text-blue-800 transition-all transform duration-300">
+              Amaz0n
+            </h1>
+          </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-6">
-          {/* Add to Cart button for non-logged-in users */}
-          {!user && (
+          <div className="flex items-center gap-4">
             <button
-              onClick={handleAddToCart}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-300 flex items-center gap-2"
+              onClick={() => navigate("/cart")}
+              className="text-blue-600 flex items-center gap-2 text-md px-4 py-2 hover:bg-gray-200 rounded-md"
             >
               <FaShoppingCart />
-              Add to Cart
+              Cart
             </button>
-          )}
+            <button
+              onClick={() => navigate("/orders")}
+              className="text-blue-600 flex items-center gap-2 text-md px-4 py-2 hover:bg-gray-200 rounded-md"
+            >
+              <FaBoxOpen />
+              Orders
+            </button>
+          </div>
 
-          {/* Account section */}
-          {user ? (
-            <div className="relative group cursor-pointer flex items-center gap-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg shadow-md">
-              <FaUserCircle className="text-3xl text-white" />
-              <div className="text-white font-semibold">
-                <p>Welcome, {user.username || user.email}</p>
-              </div>
+          {/* Right Section */}
+          <div className="flex items-center gap-6">
+            {/* Add to Cart button for non-logged-in users */}
+            {!user && (
+              <button
+                onClick={handleAddToCart}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-300 flex items-center gap-2"
+              >
+                <FaShoppingCart />
+                Add to Cart
+              </button>
+            )}
 
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 hidden group-hover:block bg-white text-black shadow-xl rounded-md mt-2 w-48 py-2">
-                <button
-                  onClick={() => navigate("/cart")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
-                >
-                  <FaShoppingCart className="mr-2" />
-                  My Cart
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
-                >
-                  Logout
-                </button>
-                <button
-                  onClick={() => navigate("/orders")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
-                >
-                  <FaBoxOpen className="mr-2" />
-                  My Orders
-                </button>
+            {/* Account section */}
+            {user ? (
+              <div className="relative group cursor-pointer flex items-center gap-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg shadow-md">
+                <FaUserCircle className="text-3xl text-white" />
+                <div className="text-white font-semibold">
+                  <p>Welcome, {user.username || user.email}</p>
+                </div>
+
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 hidden group-hover:block bg-white text-black shadow-md rounded-md mt-2 py-2">
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-200 rounded-md"
+                  >
+                    Logout
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
-      </div>
-    </header>
-    <br/>
-    
-      <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
+      </header>
+      <br />
 
-      <div className="mx-20 my-5">
-        <button
-          onClick={() => {
-            navigate("/");
-          }}
-          className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          Go to 🏠 page
-        </button>
-      </div>
+      <h2 className="text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 drop-shadow-md mb-6 animate-pulse">
+        My Orders
+      </h2>
 
       {user ? (
         <div>
@@ -176,8 +169,11 @@ const Orders = () => {
                             : "N/A"}
                         </li>
                       ))
-                    ) : (
-                      <li>No products available</li>
+                    ) : (<li className="text-center text-gray-500 text-lg font-medium py-4">
+                      No products available
+                    </li>
+                    
+                    
                     )}
                   </ul>
                 </div>
