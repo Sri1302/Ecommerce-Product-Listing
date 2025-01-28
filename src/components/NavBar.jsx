@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { AiOutlineAmazon } from "react-icons/ai"; // Amazon logo icon
 import { FaSun, FaMoon, FaShoppingCart, FaUserCircle } from "react-icons/fa";
@@ -7,18 +7,22 @@ import ProductList from "./ProductList";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../assets/redux/slices/cartSlice";
 import { useDispatch } from "react-redux";
-
+import gif from '../assets/gif.png'
+import gif2 from '../assets/gif2.png'
+import grs from '../assets/grs.png'
+import { MdNavigateNext } from "react-icons/md";
 
 const NavBar = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const [currentImageIndex, setCurrentImageIndex] = useState(0); // State to manage the current image
+  const images = [gif,gif2,grs]; // List of images
 
-  // Get the logged-in user from localStorage
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
-    // Clear user data from localStorage
     localStorage.removeItem("user");
     dispatch(clearCart());
     navigate("/login");
@@ -26,12 +30,14 @@ const NavBar = () => {
 
   const handleAddToCart = () => {
     if (user) {
-      // Navigate to cart if user is logged in
       navigate("/cart");
     } else {
-      // Otherwise, prompt user to log in/sign up
       navigate("/signup");
     }
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length); // Move to the next image
   };
 
   return (
@@ -49,6 +55,22 @@ const NavBar = () => {
           </h1>
         </div>
 
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate("/cart")}
+            className="text-blue-600 flex items-center gap-2 text-md px-4 py-2 hover:bg-gray-200 rounded-md"
+          >
+            <FaShoppingCart />
+            Cart
+          </button>
+          <button
+            onClick={() => navigate("/orders")}
+            className="text-blue-600 flex items-center gap-2 text-md px-4 py-2 hover:bg-gray-200 rounded-md"
+          >
+            <FaBoxOpen />
+            Orders
+          </button>
+        </div>
         <div className="flex items-center gap-6">
           <button
             onClick={toggleTheme}
@@ -61,7 +83,6 @@ const NavBar = () => {
             )}
           </button>
 
-          {/* Show Add to Cart button only if the user is not logged in */}
           {!user && (
             <button
               onClick={handleAddToCart}
@@ -72,42 +93,56 @@ const NavBar = () => {
             </button>
           )}
 
-          {/* Account section */}
           {user ? (
             <div className="relative group cursor-pointer flex items-center gap-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg shadow-md">
               <FaUserCircle className="text-3xl text-white" />
               <div className="text-white font-semibold">
                 <p>Welcome, {user.username || user.email}</p>
               </div>
-
-              {/* Dropdown Menu */}
-              <div className="absolute right-0 hidden group-hover:block bg-white text-black shadow-xl rounded-md mt-2 w-48 py-2">
-                <button
-                  onClick={() => navigate("/cart")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
-                >
-                  <FaShoppingCart className="mr-2" />
-                  My Cart
-                </button>
+              <div className="absolute right-0 hidden group-hover:block bg-white text-black shadow-md rounded-md mt-2 py-2">
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
+                  className="block w-full text-left text-sm px-4 py-2 hover:bg-gray-200 rounded-md"
                 >
                   Logout
-                </button>
-                <button
-                  onClick={() => navigate("/orders")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
-                >
-                  <FaBoxOpen className="mr-2" /> {/* Changed to a box icon */}
-                  My Orders
                 </button>
               </div>
             </div>
           ) : null}
         </div>
       </header>
+
       <main className="max-w-screen-lg mx-auto px-4 py-6">
+        {/* Marquee Header */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-blue-700 text-white py-8 shadow-lg flex items-center justify-center">
+  <div className="absolute whitespace-nowrap animate-scroll text-2xl font-extrabold tracking-wide py-1">
+    <span className="m-4">
+      🔥 50% Discount on All Items Purchased! Limited Time Offer! 🔥
+    </span>
+    <span className="m-4">
+      🔥 50% Discount on All Items Purchased! Limited Time Offer! 🔥
+    </span>
+  </div>
+</div>
+
+{/* Image carousel with button to change image */}
+<div className="flex justify-center my-6 relative max-w-screen-lg mx-auto">
+  <img
+    src={images[currentImageIndex]}
+    alt="Product"
+    className="w-full h-50 object-cover rounded-lg shadow-lg"
+  />
+  <button
+    onClick={nextImage}
+    className="absolute top-1/2 left-full ml-4 transform -translate-y-1/2 text-white bg-blue-600 p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+  >
+    <MdNavigateNext size={24}  />
+  </button>
+</div>
+
+
+        {/* Main Content */}
+        <br />
         <ProductList />
       </main>
     </div>

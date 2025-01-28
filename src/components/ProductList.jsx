@@ -136,7 +136,6 @@ const ProductList = () => {
                 }
                 className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center w-full"
               >
-                <FaCartPlus className="mr-2" />
                 Add to Cart
               </button>
             )}
