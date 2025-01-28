@@ -25,7 +25,7 @@ const Login = () => {
 
     try {
       // Get all users
-      const response = await axios.get('https://6760fdbb6be7889dc35f683a.mockapi.io/users');
+      const response = await axios.get('https://67979ee8c2c861de0c6d6a79.mockapi.io/users');
 
       // Check if user exists
       const user = response.data.find(
