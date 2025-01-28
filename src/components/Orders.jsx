@@ -56,34 +56,29 @@ const Orders = () => {
 
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-6">
-      <header className="max-w-screen-lg mx-auto px-4 py-6 flex justify-between items-center">
+      <header className="max-w-screen-lg mx-auto p-4 shadow-lg border-4 border-blue-500 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100">
+      {/* Main Flex Container */}
+      <div className="flex justify-between items-center">
         {/* Amazon logo with transition effect */}
-        <div className="flex items-center gap-2 cursor-pointer hover:scale-105 transform transition-all duration-300">
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:scale-105 transform transition-all duration-300"
+          onClick={() => navigate("/")}
+        >
           <AiOutlineAmazon className="text-5xl text-blue-600 hover:text-blue-800 transition-all duration-300" />
           <h1 className="text-4xl font-extrabold text-blue-600 hover:text-blue-800 transition-all transform duration-300">
             Amaz0n
           </h1>
         </div>
 
+        {/* Right Section */}
         <div className="flex items-center gap-6">
-          <button
-            onClick={toggleTheme}
-            className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
-          >
-            {theme === "light" ? (
-              <FaMoon className="text-xl" />
-            ) : (
-              <FaSun className="text-xl" />
-            )}
-          </button>
-
-          {/* Show Add to Cart button only if the user is not logged in */}
+          {/* Add to Cart button for non-logged-in users */}
           {!user && (
             <button
               onClick={handleAddToCart}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-300"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-300 flex items-center gap-2"
             >
-              <FaShoppingCart className="mr-2" />
+              <FaShoppingCart />
               Add to Cart
             </button>
           )}
@@ -115,15 +110,17 @@ const Orders = () => {
                   onClick={() => navigate("/orders")}
                   className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
                 >
-                  <FaBoxOpen className="mr-2" /> {/* Changed to a box icon */}
+                  <FaBoxOpen className="mr-2" />
                   My Orders
                 </button>
               </div>
             </div>
           ) : null}
         </div>
-      </header>
-
+      </div>
+    </header>
+    <br/>
+    
       <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
 
       <div className="mx-20 my-5">

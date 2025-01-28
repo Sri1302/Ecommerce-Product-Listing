@@ -5,10 +5,14 @@ import { FaSun, FaMoon, FaShoppingCart, FaUserCircle } from "react-icons/fa";
 import { FaBoxOpen } from "react-icons/fa";
 import ProductList from "./ProductList";
 import { useNavigate } from "react-router-dom";
+import { clearCart } from "../assets/redux/slices/cartSlice";
+import { useDispatch } from "react-redux";
+
 
 const NavBar = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   // Get the logged-in user from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
