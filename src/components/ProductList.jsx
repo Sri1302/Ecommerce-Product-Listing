@@ -14,7 +14,7 @@ const ProductList = () => {
 
   useEffect(() => {
     axios
-      .get("https://6760fdbb6be7889dc35f683a.mockapi.io/products")
+      .get("https://67979ee8c2c861de0c6d6a79.mockapi.io/products")
       .then((res) => {
         setProducts(res.data);
         // Initialize quantities based on cart items

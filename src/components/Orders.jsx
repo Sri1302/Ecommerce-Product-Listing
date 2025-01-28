@@ -1,10 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AiOutlineAmazon } from "react-icons/ai"; 
+import { ThemeContext } from "../context/ThemeContext";
+import { FaSun, FaMoon, FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { FaBoxOpen } from "react-icons/fa";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [user, setUser] = useState(null);
   const navigate = useNavigate(); // Hook to handle navigation
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  
+  const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+    dispatch(clearCart());
+    navigate("/login");
+  };
+
+  const handleAddToCart = () => {
+    if (user) {
+      // Navigate to cart if user is logged in
+      navigate("/cart");
+    } else {
+      // Otherwise, prompt user to log in/sign up
+      navigate("/signup");
+    }
+  };
 
   // Fetch orders and user information from localStorage on component mount
   useEffect(() => {
@@ -17,7 +40,9 @@ const Orders = () => {
     }
 
     const savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
-    const userOrders = savedOrders.filter((order) => order.userId === loggedInUser.id);
+    const userOrders = savedOrders.filter(
+      (order) => order.userId === loggedInUser.id
+    );
     setOrders(userOrders);
   }, []);
 
@@ -31,6 +56,74 @@ const Orders = () => {
 
   return (
     <div className="max-w-screen-lg mx-auto px-4 py-6">
+      <header className="max-w-screen-lg mx-auto px-4 py-6 flex justify-between items-center">
+        {/* Amazon logo with transition effect */}
+        <div className="flex items-center gap-2 cursor-pointer hover:scale-105 transform transition-all duration-300">
+          <AiOutlineAmazon className="text-5xl text-blue-600 hover:text-blue-800 transition-all duration-300" />
+          <h1 className="text-4xl font-extrabold text-blue-600 hover:text-blue-800 transition-all transform duration-300">
+            Amaz0n
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <button
+            onClick={toggleTheme}
+            className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
+          >
+            {theme === "light" ? (
+              <FaMoon className="text-xl" />
+            ) : (
+              <FaSun className="text-xl" />
+            )}
+          </button>
+
+          {/* Show Add to Cart button only if the user is not logged in */}
+          {!user && (
+            <button
+              onClick={handleAddToCart}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-md shadow-lg transform transition-all duration-300"
+            >
+              <FaShoppingCart className="mr-2" />
+              Add to Cart
+            </button>
+          )}
+
+          {/* Account section */}
+          {user ? (
+            <div className="relative group cursor-pointer flex items-center gap-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg shadow-md">
+              <FaUserCircle className="text-3xl text-white" />
+              <div className="text-white font-semibold">
+                <p>Welcome, {user.username || user.email}</p>
+              </div>
+
+              {/* Dropdown Menu */}
+              <div className="absolute right-0 hidden group-hover:block bg-white text-black shadow-xl rounded-md mt-2 w-48 py-2">
+                <button
+                  onClick={() => navigate("/cart")}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
+                >
+                  <FaShoppingCart className="mr-2" />
+                  My Cart
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
+                >
+                  Logout
+                </button>
+                <button
+                  onClick={() => navigate("/orders")}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-200 rounded-md"
+                >
+                  <FaBoxOpen className="mr-2" /> {/* Changed to a box icon */}
+                  My Orders
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </header>
+
       <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
 
       <div className="mx-20 my-5">
@@ -51,12 +144,20 @@ const Orders = () => {
               <div
                 key={index}
                 className="border-b py-4 mb-4"
-                style={{ boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", padding: "15px", borderRadius: "10px" }}
+                style={{
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  padding: "15px",
+                  borderRadius: "10px",
+                }}
               >
-                <h3 className="text-xl font-semibold mb-2">Order #{index + 1}</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  Order #{index + 1}
+                </h3>
                 <div className="text-lg font-bold mb-1">
                   Total: $
-                  {typeof order.totalAmount === "number" ? order.totalAmount.toFixed(2) : "N/A"}
+                  {typeof order.totalAmount === "number"
+                    ? order.totalAmount.toFixed(2)
+                    : "N/A"}
                 </div>
                 <div className="text-sm text-gray-500">
                   Ordered on: {new Date(order.date).toLocaleString()}
@@ -73,7 +174,9 @@ const Orders = () => {
                       order.products.map((product, prodIndex) => (
                         <li key={prodIndex} className="mb-1">
                           {product.name} - {product.quantity} x $
-                          {product.price?.toFixed(2) || "N/A"}
+                          {typeof product.price === "number"
+                            ? product.price.toFixed(2)
+                            : "N/A"}
                         </li>
                       ))
                     ) : (
@@ -84,13 +187,16 @@ const Orders = () => {
 
                 {/* Shipping Details */}
                 <div className="mt-4">
-                  <h4 className="text-lg font-semibold mb-2">Shipping Address:</h4>
+                  <h4 className="text-lg font-semibold mb-2">
+                    Shipping Address:
+                  </h4>
                   {order.shippingDetails ? (
                     <>
                       <p>{order.shippingDetails.name}</p>
                       <p>{order.shippingDetails.address}</p>
                       <p>
-                        {order.shippingDetails.city}, {order.shippingDetails.state},{" "}
+                        {order.shippingDetails.city},{" "}
+                        {order.shippingDetails.state},{" "}
                         {order.shippingDetails.zipCode}
                       </p>
                     </>

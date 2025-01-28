@@ -87,7 +87,7 @@ const Checkout = () => {
         <ul className="list-disc pl-6 mt-4">
           {cartItems.map((item, index) => (
             <li key={index}>
-              <span>{item.name}</span> - {item.quantity} x ${item.price.toFixed(2)}
+              <span>{item.name}</span> - {item.quantity} x ${Number(item.price).toFixed(2)}
             </li>
           ))}
         </ul>
